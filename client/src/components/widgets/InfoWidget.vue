@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
 import { ref, onMounted } from 'vue';
+import { useApi } from '@/composables/useApi';
+import type { IBasicInfo } from '@/../../shared/models/IBasicInfo';
 import Widget from '@/components/widgets/Widget.vue';
 
-let response: Ref<{ title: string, version: string } | null> = ref(null);
-
-onMounted(async () => {
-  const request = await fetch(`${import.meta.env.VITE_APIURL}/api/widget/basicInfo`);
-  const json = await request.json();
-  console.log(json);
-  response.value = json.data;
-});
+const { getBasicInfo } = useApi();
+const basicInfo: Ref<IBasicInfo | null> = ref(null);
+getBasicInfo()
+  .then(value => basicInfo.value = value).catch(e => console.log(e));
 </script>
 
 <template>
@@ -20,8 +18,6 @@ onMounted(async () => {
     :grid-to-row="2"
     :grid-to-col="4"
   >
-    <div v-if="response">
-      {{ response.title }} | {{ response.version }}
-    </div>
+    {{ basicInfo }}
   </Widget>
 </template>
