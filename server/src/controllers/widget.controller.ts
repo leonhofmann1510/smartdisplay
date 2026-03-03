@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getProjectInfo } from "../services/widget.service";
-import { IBasicInfo } from "../models/IBasicInfo";
+import { IBasicInfo } from "../../../shared/models/IBasicInfo";
 import { sendSuccess } from "../utils/response";
 
 export const getBasicInfo = async (req: Request, res: Response) => {

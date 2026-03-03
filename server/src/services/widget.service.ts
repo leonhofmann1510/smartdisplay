@@ -1,4 +1,4 @@
-import { IBasicInfo } from "../models/IBasicInfo";
+import { IBasicInfo } from "../../../shared/models/IBasicInfo";
 
 export const getProjectInfo = async (): Promise<IBasicInfo> => {
   let basicInfo: IBasicInfo = {

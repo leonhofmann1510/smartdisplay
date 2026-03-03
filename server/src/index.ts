@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
