@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { sendError } from "../utils/response";
 
 export const errorMiddleware = (
   err: any,
@@ -6,7 +7,9 @@ export const errorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  res.status(err.statusCode || 500).json({
-    message: err.message || "Internal Server Error"
-  });
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  const errorDetails = process.env.NODE_ENV === "development" ? err.stack : undefined;
+
+  sendError(res, message, statusCode, errorDetails);
 };
