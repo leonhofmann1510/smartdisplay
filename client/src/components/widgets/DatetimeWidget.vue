@@ -1,5 +1,24 @@
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+
 import Widget from '@/components/widgets/Widget.vue';
+
+const h = ref<number>();
+const m = ref<number>();
+const s = ref<number>();
+
+let interval: number;
+
+onMounted(() => {
+  interval = setInterval(() => {
+    const now = Date.now();
+    s.value = Math.floor(now / 1000) % 60;
+    m.value = Math.floor(now / (1000 * 60)) % 60;
+    h.value = Math.floor(now / (1000 * 60 * 60)) % 24;
+  }, 1000);
+});
+
+onBeforeUnmount(() => clearInterval(interval));
 </script>
 
 <template>
@@ -9,6 +28,6 @@ import Widget from '@/components/widgets/Widget.vue';
     :grid-to-row="2"
     :grid-to-col="3"
   >
-    Hello World
+    <div>{{ h }}:{{ m }}:{{ s }}</div>
   </Widget>
 </template>
