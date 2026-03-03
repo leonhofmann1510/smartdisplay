@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type JsonPrimitive = string | number | boolean | null
@@ -15,15 +18,59 @@ export type PatchOp =
 
 export type QueryMatch = { path: string; value: JsonValue }
 
+// ─── DB Directory ─────────────────────────────────────────────────────────────
+
+let DB_DIR = path.join(process.cwd(), 'db')
+
+/** Override the default db directory */
+export const setDbDir = (dir: string): void => {
+  DB_DIR = dir
+}
+
 // ─── JsonHandler ─────────────────────────────────────────────────────────────
 
 export class JsonHandler<T extends JsonObject = JsonObject> {
   private data: T
   private listeners: Map<string, Set<PathListener>>
+  private filePath: string | null
 
-  constructor(initialData: T = {} as T) {
+  constructor(initialData: T = {} as T, filePath: string | null = null) {
     this.data = this.deepClone(initialData)
     this.listeners = new Map()
+    this.filePath = filePath
+  }
+
+  /**
+   * Open (or create) a named JSON table in the db directory.
+   * Loads existing data from disk if the file exists, otherwise
+   * writes the initialData as a new file.
+   */
+  static async open<T extends JsonObject = JsonObject>(
+    name: string,
+    initialData: T = {} as T,
+  ): Promise<JsonHandler<T>> {
+    await fs.promises.mkdir(DB_DIR, { recursive: true })
+
+    const filePath = path.join(DB_DIR, `${name}.json`)
+    let data: T
+
+    try {
+      const raw = await fs.promises.readFile(filePath, 'utf-8')
+      data = JSON.parse(raw) as T
+    } catch {
+      data = initialData
+      await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8')
+    }
+
+    return new JsonHandler<T>(data, filePath)
+  }
+
+  /** Persist current state to disk (fire-and-forget) */
+  private persist(): void {
+    if (!this.filePath) return
+    fs.promises
+      .writeFile(this.filePath, JSON.stringify(this.data, null, 2), 'utf-8')
+      .catch(err => console.error(`[JsonHandler] Failed to persist ${this.filePath}:`, err))
   }
 
   // ── Path Utilities ──────────────────────────────────────────────────────────
@@ -97,35 +144,22 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
   }
 
   private notifyListeners(path: string, newValue: unknown, oldValue: unknown): void {
-    // Notify exact path listeners
     const exact = this.listeners.get(path)
-    if (exact) {
-      exact.forEach(cb => cb(newValue, oldValue, path))
-    }
+    if (exact) exact.forEach(cb => cb(newValue, oldValue, path))
 
-    // Notify wildcard listeners on parent paths
     const parts = this.parsePath(path)
     for (let i = parts.length - 1; i >= 0; i--) {
       const parent = parts.slice(0, i).join('.')
       const wildcardKey = parent ? `${parent}.*` : '*'
-      const wildcardListeners = this.listeners.get(wildcardKey)
-      if (wildcardListeners) {
-        wildcardListeners.forEach(cb => cb(newValue, oldValue, path))
-      }
+      this.listeners.get(wildcardKey)?.forEach(cb => cb(newValue, oldValue, path))
     }
 
-    // Root wildcard
-    const rootWild = this.listeners.get('**')
-    if (rootWild) {
-      rootWild.forEach(cb => cb(newValue, oldValue, path))
-    }
+    this.listeners.get('**')?.forEach(cb => cb(newValue, oldValue, path))
   }
 
   // ── Core CRUD ───────────────────────────────────────────────────────────────
 
-  /** Get the entire state object */
   get(): T
-  /** Get value at dot-notation path */
   get<V = JsonValue>(path: string): V | undefined
   get<V = JsonValue>(path?: string): T | V | undefined {
     if (path == null) return this.deepClone(this.data)
@@ -134,119 +168,105 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
     return this.deepClone(this.getByPath(this.data, parts)) as V
   }
 
-  /** Set value at dot-notation path, creates nested objects as needed */
   set(path: string, value: JsonValue): this {
     const parts = this.parsePath(path)
     const oldValue = this.getByPath(this.data, parts)
     this.setByPath(this.data as Record<string, unknown>, parts, this.deepClone(value))
     this.notifyListeners(path, this.deepClone(value), oldValue)
+    this.persist()
     return this
   }
 
-  /** Delete a key at dot-notation path */
   delete(path: string): boolean {
     const parts = this.parsePath(path)
     const oldValue = this.getByPath(this.data, parts)
     const deleted = this.deleteByPath(this.data as Record<string, unknown>, parts)
-    if (deleted) this.notifyListeners(path, undefined, oldValue)
+    if (deleted) {
+      this.notifyListeners(path, undefined, oldValue)
+      this.persist()
+    }
     return deleted
   }
 
-  /** Check if a path exists (and is not undefined) */
   has(path: string): boolean {
-    const parts = this.parsePath(path)
-    return this.getByPath(this.data, parts) !== undefined
+    return this.getByPath(this.data, this.parsePath(path)) !== undefined
   }
 
   // ── Bulk Operations ─────────────────────────────────────────────────────────
 
-  /** Deep-merge a partial object into the root state */
   merge(partial: Partial<T>): this {
     const oldData = this.deepClone(this.data)
     this.data = this.deepMergeObjects(this.data, partial as JsonObject) as T
     this.notifyListeners('**', this.deepClone(this.data), oldData)
+    this.persist()
     return this
   }
 
-  /** Deep-merge an object into a specific path */
   mergeAt(path: string, value: JsonObject): this {
     const parts = this.parsePath(path)
     const existing = this.getByPath(this.data, parts)
     const merged = this.deepMergeObjects(
       (existing && typeof existing === 'object' && !Array.isArray(existing) ? existing : {}) as JsonObject,
-      value
+      value,
     )
     return this.set(path, merged)
   }
 
-  /** Completely replace the state */
   replace(data: T): this {
     const oldData = this.deepClone(this.data)
     this.data = this.deepClone(data)
     this.notifyListeners('**', this.deepClone(this.data), oldData)
+    this.persist()
     return this
   }
 
-  /** Reset the state to an empty object */
   reset(): this {
     return this.replace({} as T)
   }
 
-  /** Push an item to an array at path */
   push(path: string, item: JsonValue): this {
-    const parts = this.parsePath(path)
-    const current = this.getByPath(this.data, parts)
+    const current = this.getByPath(this.data, this.parsePath(path))
     const arr: JsonArray = Array.isArray(current) ? [...current] : []
     arr.push(this.deepClone(item))
     return this.set(path, arr)
   }
 
-  /** Remove items from an array at path by predicate */
   pull(path: string, predicate: (item: JsonValue, index: number) => boolean): this {
-    const parts = this.parsePath(path)
-    const current = this.getByPath(this.data, parts)
+    const current = this.getByPath(this.data, this.parsePath(path))
     if (!Array.isArray(current)) return this
     return this.set(path, current.filter((item, i) => !predicate(item, i)))
   }
 
-  /** Update items in an array at path by predicate */
   updateWhere(
     path: string,
     predicate: (item: JsonValue, index: number) => boolean,
-    updater: (item: JsonValue, index: number) => JsonValue
+    updater: (item: JsonValue, index: number) => JsonValue,
   ): this {
-    const parts = this.parsePath(path)
-    const current = this.getByPath(this.data, parts)
+    const current = this.getByPath(this.data, this.parsePath(path))
     if (!Array.isArray(current)) return this
     return this.set(path, current.map((item, i) => (predicate(item, i) ? updater(item, i) : item)))
   }
 
   // ── Serialization ───────────────────────────────────────────────────────────
 
-  /** Serialize state to a JSON string */
   toJSON(indent?: number): string {
     return JSON.stringify(this.data, null, indent)
   }
 
-  /** Deserialize a JSON string into the state (replaces current state) */
   fromJSON(json: string): this {
-    const parsed = JSON.parse(json) as T
-    return this.replace(parsed)
+    return this.replace(JSON.parse(json) as T)
   }
 
-  /** Return a plain object copy of the state */
   toObject(): T {
     return this.deepClone(this.data)
   }
 
-  /** Return a new JsonHandler with a deep-cloned copy of this state */
   clone(): JsonHandler<T> {
     return new JsonHandler<T>(this.deepClone(this.data))
   }
 
   // ── Flatten / Unflatten ─────────────────────────────────────────────────────
 
-  /** Flatten nested state to dot-notation key/value pairs */
   flatten(separator = '.'): Record<string, JsonPrimitive | null> {
     const result: Record<string, JsonPrimitive | null> = {}
 
@@ -265,7 +285,6 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
     }
 
     walk(this.data, '')
-    // Remove the leading separator from root-level prefix artifact
     const cleaned: Record<string, JsonPrimitive | null> = {}
     for (const [k, v] of Object.entries(result)) {
       cleaned[k.startsWith(separator) ? k.slice(separator.length) : k] = v
@@ -273,7 +292,6 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
     return cleaned
   }
 
-  /** Build a nested object from dot-notation key/value pairs */
   static unflatten(flat: Record<string, unknown>, separator = '.'): JsonObject {
     const result: JsonObject = {}
     for (const [dotPath, value] of Object.entries(flat)) {
@@ -281,9 +299,7 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
       let current: Record<string, unknown> = result
       for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i]!
-        if (current[part] == null || typeof current[part] !== 'object') {
-          current[part] = {}
-        }
+        if (current[part] == null || typeof current[part] !== 'object') current[part] = {}
         current = current[part] as Record<string, unknown>
       }
       current[parts[parts.length - 1]!] = value
@@ -293,138 +309,95 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
 
   // ── Query ───────────────────────────────────────────────────────────────────
 
-  /** Pick specific top-level keys (or dot-notation paths) */
   pick(paths: string[]): JsonObject {
     const result: JsonObject = {}
-    for (const path of paths) {
-      const parts = this.parsePath(path)
+    for (const p of paths) {
+      const parts = this.parsePath(p)
       const value = this.getByPath(this.data, parts)
-      if (value !== undefined) {
-        this.setByPath(result as Record<string, unknown>, parts, this.deepClone(value))
-      }
+      if (value !== undefined) this.setByPath(result as Record<string, unknown>, parts, this.deepClone(value))
     }
     return result
   }
 
-  /** Omit specific top-level keys (or dot-notation paths) */
   omit(paths: string[]): T {
     const cloned = this.deepClone(this.data)
-    for (const path of paths) {
-      const parts = this.parsePath(path)
-      this.deleteByPath(cloned as Record<string, unknown>, parts)
-    }
+    for (const p of paths) this.deleteByPath(cloned as Record<string, unknown>, this.parsePath(p))
     return cloned
   }
 
-  /** Get all keys at a path (or root) */
   keys(path?: string): string[] {
     const target = path ? this.getByPath(this.data, this.parsePath(path)) : this.data
     if (target == null || typeof target !== 'object' || Array.isArray(target)) return []
     return Object.keys(target)
   }
 
-  /** Get all values at a path (or root) */
   values(path?: string): JsonValue[] {
     const target = path ? this.getByPath(this.data, this.parsePath(path)) : this.data
     if (target == null || typeof target !== 'object' || Array.isArray(target)) return []
     return Object.values(target as JsonObject)
   }
 
-  /** Get all entries at a path (or root) */
   entries(path?: string): [string, JsonValue][] {
     const target = path ? this.getByPath(this.data, this.parsePath(path)) : this.data
     if (target == null || typeof target !== 'object' || Array.isArray(target)) return []
     return Object.entries(target as JsonObject)
   }
 
-  /** Find first value matching predicate via deep traversal */
   find(predicate: (value: JsonValue, path: string) => boolean): QueryMatch | undefined {
-    const flat = this.flatten()
-    for (const [path, value] of Object.entries(flat)) {
-      if (predicate(value, path)) return { path, value }
+    for (const [p, value] of Object.entries(this.flatten())) {
+      if (predicate(value, p)) return { path: p, value }
     }
     return undefined
   }
 
-  /** Find all values matching predicate via deep traversal */
   filter(predicate: (value: JsonValue, path: string) => boolean): QueryMatch[] {
-    const flat = this.flatten()
-    return Object.entries(flat)
-      .filter(([path, value]) => predicate(value, path))
-      .map(([path, value]) => ({ path, value }))
+    return Object.entries(this.flatten())
+      .filter(([p, value]) => predicate(value, p))
+      .map(([p, value]) => ({ path: p, value }))
   }
 
-  /** Compute a value derived from state */
   compute<R>(selector: (state: T) => R): R {
     return selector(this.deepClone(this.data))
   }
 
   // ── Patch Operations ────────────────────────────────────────────────────────
 
-  /** Apply an array of patch operations atomically */
   patch(ops: PatchOp[]): this {
     for (const op of ops) {
-      switch (op.op) {
-        case 'set':
-          this.set(op.path, op.value)
-          break
-        case 'delete':
-          this.delete(op.path)
-          break
-        case 'merge':
-          this.mergeAt(op.path, op.value)
-          break
-      }
+      if (op.op === 'set') this.set(op.path, op.value)
+      else if (op.op === 'delete') this.delete(op.path)
+      else if (op.op === 'merge') this.mergeAt(op.path, op.value)
     }
     return this
   }
 
-  /** Compute the diff between this state and another as patch ops */
   diff(other: JsonHandler<T> | T): PatchOp[] {
-    const otherFlat = other instanceof JsonHandler
-      ? other.flatten()
-      : new JsonHandler(other).flatten()
+    const otherFlat = other instanceof JsonHandler ? other.flatten() : new JsonHandler(other).flatten()
     const thisFlat = this.flatten()
     const ops: PatchOp[] = []
 
-    for (const [path, value] of Object.entries(otherFlat)) {
-      if (thisFlat[path] !== value) {
-        ops.push({ op: 'set', path, value: value as JsonValue })
-      }
+    for (const [p, value] of Object.entries(otherFlat)) {
+      if (thisFlat[p] !== value) ops.push({ op: 'set', path: p, value: value as JsonValue })
     }
-    for (const path of Object.keys(thisFlat)) {
-      if (!(path in otherFlat)) {
-        ops.push({ op: 'delete', path })
-      }
+    for (const p of Object.keys(thisFlat)) {
+      if (!(p in otherFlat)) ops.push({ op: 'delete', path: p })
     }
     return ops
   }
 
   // ── Observer / Subscriptions ────────────────────────────────────────────────
 
-  /**
-   * Subscribe to changes at a path.
-   * - Exact path: `"user.name"`
-   * - Wildcard child: `"user.*"` (fires for any direct child change)
-   * - Any change: `"**"`
-   */
   subscribe<V = JsonValue>(path: string, listener: PathListener<V>): Unsubscribe {
-    if (!this.listeners.has(path)) {
-      this.listeners.set(path, new Set())
-    }
+    if (!this.listeners.has(path)) this.listeners.set(path, new Set())
     this.listeners.get(path)!.add(listener as PathListener)
-    return () => {
-      this.listeners.get(path)?.delete(listener as PathListener)
-    }
+    return () => this.listeners.get(path)?.delete(listener as PathListener)
   }
 
-  /** Remove all listeners for a specific path */
   unsubscribeAll(path: string): this {
     this.listeners.delete(path)
     return this
   }
 
-  /** Remove every listener */
   clearListeners(): this {
     this.listeners.clear()
     return this
@@ -432,24 +405,20 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
 
   // ── Snapshot / History ──────────────────────────────────────────────────────
 
-  /** Capture the current state as a serialized snapshot string */
   snapshot(): string {
     return this.toJSON()
   }
 
-  /** Restore the state from a snapshot string */
   restore(snapshot: string): this {
     return this.fromJSON(snapshot)
   }
 
   // ── Utilities ───────────────────────────────────────────────────────────────
 
-  /** Return the number of top-level keys (or keys at path) */
   size(path?: string): number {
     return this.keys(path).length
   }
 
-  /** Check if state (or value at path) is empty */
   isEmpty(path?: string): boolean {
     if (path == null) return Object.keys(this.data).length === 0
     const value = this.get(path)
@@ -459,16 +428,8 @@ export class JsonHandler<T extends JsonObject = JsonObject> {
     return false
   }
 
-  /** Pretty-print state to console */
   print(path?: string): this {
-    const target = path ? this.get(path) : this.data
-    console.log(JSON.stringify(target, null, 2))
+    console.log(JSON.stringify(path ? this.get(path) : this.data, null, 2))
     return this
   }
 }
-
-// ─── Factory ──────────────────────────────────────────────────────────────────
-
-/** Create a new JsonHandler instance */
-export const createJsonHandler = <T extends JsonObject = JsonObject>(initialData?: T): JsonHandler<T> =>
-  new JsonHandler<T>(initialData)
