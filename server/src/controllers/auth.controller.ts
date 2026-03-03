@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sendSuccess } from "../utils/response";
+import { sendError, sendSuccess } from "../utils/response";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
@@ -12,7 +12,7 @@ export const login = async (req: Request, res: Response) => {
   const { password } = req.body;
 
   if (password !== DISPLAY_PASSWORD) {
-    return res.status(401).json({ message: "Wrong password" });
+    return sendError(res, "Wrong password", 401);
   }
 
   const token = jwt.sign(

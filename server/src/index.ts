@@ -1,11 +1,13 @@
-import 'dotenv/config';
+import dotenv from 'dotenv'
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
 
-const app = express();
+dotenv.config();
 const PORT = process.env.PORT ?? 3000;
+
+const app = express();
 
 // const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173')
 //   .split(',')
