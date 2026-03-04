@@ -14,7 +14,7 @@ const cssStyles = computed(() => ({
 </script>
 
 <template>
-  <div :style="cssStyles" class="bg-white shadow-xl rounded-xl [container-type:inline-size]">
+  <div :style="cssStyles" class="bg-white shadow-xl rounded-xl @container">
     <slot />
   </div>
 </template>

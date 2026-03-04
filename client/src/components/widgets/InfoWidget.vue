@@ -13,12 +13,14 @@ getBasicInfo()
 
 <template>
   <Widget
-    :grid-from-row="1"
-    :grid-from-col="3"
-    :grid-to-row="2"
-    :grid-to-col="4"
+    :grid-from-row="4"
+    :grid-from-col="8"
+    :grid-to-row="4"
+    :grid-to-col="8"
   >
-    {{ basicInfo?.title }} | {{ basicInfo?.version }}
+    <div class="h-full w-full flex justify-center items-center">
+      <p class="text-center text-[8cqw]">Currently running {{ basicInfo?.title }} v{{ basicInfo?.version }}</p>
+    </div>
   </Widget>
 </template>
 1
