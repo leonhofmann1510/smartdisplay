@@ -8,8 +8,8 @@ const date = ref('');
 
 const update = () => {
   const now = new Date();
-  time.value = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  date.value = now.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+  time.value = now.toLocaleTimeString('en-EN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  date.value = now.toLocaleDateString('en-EN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
 let interval: number;
@@ -32,7 +32,7 @@ onBeforeUnmount(() => clearInterval(interval));
     <div class="flex justify-center items-center h-full">
       <div>
         <p class="text-[18cqw] text-center font-bold leading-none">{{ time }}</p>
-        <p class="text-[9cqw] text-center">{{ date }}</p>
+        <p class="text-[6cqw] text-center">{{ date }}</p>
       </div>
     </div>
   </Widget>

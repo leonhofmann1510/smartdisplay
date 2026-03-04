@@ -15,8 +15,8 @@ export const getCurrentWeather = async (req: Request, res: Response) => {
   const storedData = store.get("weather.data");
   const storedTimeStamp = store.get("weather.lastUpdated");
 
-  if (storedTimeStamp && ((Number(storedTimeStamp) + 1000*60*30) > Date.now())) {
-    sendSuccess(res, storedData, "Cached Weather information retrieved successfully");
+  if (storedTimeStamp && ((Number(storedTimeStamp) + 1000*60*1) > Date.now())) {
+    sendSuccess(res, JSON.parse(storedData as string), "Cached Weather information retrieved successfully");
     return;
   }
 

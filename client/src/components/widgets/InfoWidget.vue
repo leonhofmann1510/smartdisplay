@@ -14,7 +14,7 @@ getBasicInfo()
 <template>
   <Widget
     :grid-from-row="4"
-    :grid-from-col="8"
+    :grid-from-col="7"
     :grid-to-row="4"
     :grid-to-col="8"
   >
