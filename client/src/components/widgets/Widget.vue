@@ -9,12 +9,12 @@ const props = defineProps<{
 }>();
 
 const cssStyles = computed(() => ({
-  'grid-area': `${props.gridFromRow} / ${props.gridFromCol} / ${props.gridToRow} / ${props.gridToCol}`
+  'grid-area': `${props.gridFromRow} / ${props.gridFromCol} / ${props.gridToRow + 1} / ${props.gridToCol + 1}`
 }));
 </script>
 
 <template>
-  <div :style="cssStyles" class="bg-white shadow-xl rounded-xl">
+  <div :style="cssStyles" class="bg-white shadow-xl rounded-xl [container-type:inline-size]">
     <slot />
   </div>
 </template>

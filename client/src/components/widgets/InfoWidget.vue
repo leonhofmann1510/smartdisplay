@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useApi } from '@/composables/useApi';
 import type { IBasicInfo } from '@/../../shared/models/IBasicInfo';
 import Widget from '@/components/widgets/Widget.vue';
@@ -18,6 +18,7 @@ getBasicInfo()
     :grid-to-row="2"
     :grid-to-col="4"
   >
-    {{ basicInfo }}
+    {{ basicInfo?.title }} | {{ basicInfo?.version }}
   </Widget>
 </template>
+1

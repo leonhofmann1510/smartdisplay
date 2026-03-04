@@ -1,13 +1,5 @@
 import { Response } from "express";
-
-interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
-  data?: T;
-  error?: string;
-  statusCode: number;
-  timestamp: string;
-}
+import { IApiResponse } from "../../../shared/models/IApiResponse";
 
 /**
  * Send a successful response
@@ -21,7 +13,7 @@ export const sendSuccess = <T = any>(
   data: T,
   message: string = "Success",
   statusCode: number = 200
-): Response<ApiResponse<T>> => {
+): Response<IApiResponse<T>> => {
   return res.status(statusCode).json({
     success: true,
     message,
@@ -43,7 +35,7 @@ export const sendError = (
   message: string = "Internal Server Error",
   statusCode: number = 500,
   error?: string
-): Response<ApiResponse> => {
+): Response<IApiResponse> => {
   return res.status(statusCode).json({
     success: false,
     message,
@@ -62,7 +54,7 @@ export class ResponseHelper {
     data: T,
     message: string = "Success",
     statusCode: number = 200
-  ): Response<ApiResponse<T>> {
+  ): Response<IApiResponse<T>> {
     return sendSuccess(res, data, message, statusCode);
   }
 
@@ -71,7 +63,7 @@ export class ResponseHelper {
     message: string = "Internal Server Error",
     statusCode: number = 500,
     error?: string
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, statusCode, error);
   }
 
@@ -79,7 +71,7 @@ export class ResponseHelper {
     res: Response,
     data: T,
     message: string = "Resource created successfully"
-  ): Response<ApiResponse<T>> {
+  ): Response<IApiResponse<T>> {
     return sendSuccess(res, data, message, 201);
   }
 
@@ -91,35 +83,35 @@ export class ResponseHelper {
     res: Response,
     message: string = "Bad Request",
     error?: string
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, 400, error);
   }
 
   static unauthorized(
     res: Response,
     message: string = "Unauthorized"
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, 401);
   }
 
   static forbidden(
     res: Response,
     message: string = "Forbidden"
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, 403);
   }
 
   static notFound(
     res: Response,
     message: string = "Resource not found"
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, 404);
   }
 
   static conflict(
     res: Response,
     message: string = "Conflict"
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, 409);
   }
 
@@ -127,7 +119,7 @@ export class ResponseHelper {
     res: Response,
     message: string = "Internal Server Error",
     error?: string
-  ): Response<ApiResponse> {
+  ): Response<IApiResponse> {
     return sendError(res, message, 500, error);
   }
 }

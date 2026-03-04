@@ -1,1 +1,11 @@
+/* Arimo Font (Google) */
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
+
+/* Set Font */
+body {
+  font-family: "Arimo", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 @import 'tailwindcss';
