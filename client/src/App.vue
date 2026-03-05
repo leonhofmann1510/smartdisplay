@@ -2,6 +2,7 @@
 import DatetimeWidget from '@/components/widgets/DatetimeWidget.vue';
 import InfoWidget from '@/components/widgets/InfoWidget.vue';
 import WeatherWidget from '@/components/widgets/WeatherWidget.vue';
+import MusicWidget from '@/components/widgets/MusicWidget.vue';
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import WeatherWidget from '@/components/widgets/WeatherWidget.vue';
     <DatetimeWidget />
     <InfoWidget />
     <WeatherWidget />
+    <MusicWidget />
   </div>
 </template>
 

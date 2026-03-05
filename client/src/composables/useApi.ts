@@ -12,9 +12,13 @@ const getBasicInfo = (): Promise<IBasicInfo> =>
 const getWeather = (): Promise<IWeatherResponse> =>
   get<IApiResponse<IWeatherResponse>>(`${APIURL}/widget/currentWeather`).then(res => res.data!);
 
+const getPlaylist = (): Promise<IApiResponse<string[]>> =>
+  get<IApiResponse<string[]>>(`${APIURL}/widget/playlist`) 
+
 export const useApi = () => {
   return {
     getBasicInfo,
-    getWeather
+    getWeather,
+    getPlaylist
   };
 };

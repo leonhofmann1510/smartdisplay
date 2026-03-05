@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
+import path from 'path';
 
 dotenv.config();
 const PORT = process.env.PORT ?? 3000;
@@ -23,6 +24,8 @@ app.use(cors());
 //   },
 //   credentials: true,
 // }));
+
+app.use(express.static(path.join(__dirname, '../public')))
 
 app.use(express.json());
 
