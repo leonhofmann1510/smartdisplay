@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { useApi } from '@/composables/useApi';
 import type { IBasicInfo } from '@/../../shared/models/IBasicInfo';
-import FitText from './FitText.vue';
+import FitText from '../FitText.vue';
 
 const { getBasicInfo } = useApi();
 const basicInfo: Ref<IBasicInfo | null> = ref(null);

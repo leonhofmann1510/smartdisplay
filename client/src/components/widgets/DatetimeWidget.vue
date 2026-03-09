@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import FitText from './FitText.vue';
+import FitText from '../FitText.vue';
 
 const time = ref('');
 const date = ref('');

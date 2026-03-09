@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, type Ref } from 'vue';
 import type { IQuote } from '../../../../shared/models/IQuote';
 import { useApi } from '@/composables/useApi';
-import FitText from './FitText.vue';
+import FitText from '../FitText.vue';
 
 const props = defineProps<{
   cycleLength: number

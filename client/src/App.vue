@@ -3,7 +3,7 @@ import DatetimeWidget from '@/components/widgets/DatetimeWidget.vue';
 import InfoWidget from '@/components/widgets/InfoWidget.vue';
 import WeatherWidget from '@/components/widgets/WeatherWidget.vue';
 import Widget from './components/widgets/Widget.vue';
-import InsiprationWidget from './components/widgets/InsiprationWidget.vue';
+import InsiprationWidget from './components/widgets/QuoteWidget.vue';
 </script>
 
 <template>
