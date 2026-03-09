@@ -22,11 +22,11 @@ onBeforeUnmount(() => clearInterval(interval));
 </script>
 
 <template>
-  <div class="flex flex-col h-full px-6 py-4">
-    <div class="flex-3 w-full">
+  <div class="flex h-full flex-col items-center justify-center px-6 py-4 gap-1">
+    <div class="w-full h-[58%]">
       <FitText class="font-bold">{{ time }}</FitText>
     </div>
-    <div class="flex-1 w-full">
+    <div class="w-full h-[32%]">
       <FitText>{{ date }}</FitText>
     </div>
   </div>

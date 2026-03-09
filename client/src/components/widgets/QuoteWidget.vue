@@ -37,8 +37,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-[3%] rounded-full bg-black" :style="{ width: width + '%' }"></div>
-  <div class="flex flex-col h-[97%] px-6 pt-2 pb-4">
+  <div class="h-2.5 rounded-full bg-black" :style="{ width: width + '%' }"></div>
+  <div class="flex flex-col h-[calc(100%-10px)] px-6 pt-2 pb-4">
     <div class="flex-1 flex flex-col gap-1 pt-3">
       <div class="flex-4">
         <FitText multiline class="font-bold">{{ quote?.text }}</FitText>
