@@ -16,12 +16,12 @@ import InsiprationWidget from './components/widgets/InsiprationWidget.vue';
       :grid-to-col="6"
     ><DatetimeWidget /></Widget>
 
-    <!-- <Widget
-      :grid-from-row="4"
+    <Widget
+      :grid-from-row="1"
       :grid-from-col="7"
       :grid-to-row="4"
       :grid-to-col="8"
-    ><InfoWidget /></Widget> -->
+    ><InfoWidget /></Widget>
     
     <Widget
       :grid-from-row="1"
@@ -35,7 +35,7 @@ import InsiprationWidget from './components/widgets/InsiprationWidget.vue';
       :grid-from-col="3"
       :grid-to-row="4"
       :grid-to-col="6"
-    ><InsiprationWidget :cycle-length="30"/></Widget>
+    ><InsiprationWidget :cycle-length="60"/></Widget>
   </div>
 </template>
 

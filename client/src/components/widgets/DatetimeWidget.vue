@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import FitText from './FitText.vue';
 
 const time = ref('');
 const date = ref('');
@@ -21,10 +22,12 @@ onBeforeUnmount(() => clearInterval(interval));
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-full">
-    <div>
-      <p class="text-[18cqmin] text-center font-bold leading-none">{{ time }}</p>
-      <p class="text-[6cqmin] text-center">{{ date }}</p>
+  <div class="flex flex-col h-full px-6 py-4">
+    <div class="flex-3 w-full">
+      <FitText class="font-bold">{{ time }}</FitText>
+    </div>
+    <div class="flex-1 w-full">
+      <FitText>{{ date }}</FitText>
     </div>
   </div>
 </template>
