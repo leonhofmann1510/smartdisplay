@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 
-import Widget from '@/components/widgets/Widget.vue';
-
 const time = ref('');
 const date = ref('');
 
@@ -23,17 +21,10 @@ onBeforeUnmount(() => clearInterval(interval));
 </script>
 
 <template>
-  <Widget
-    :grid-from-row="1"
-    :grid-from-col="1"
-    :grid-to-row="1"
-    :grid-to-col="2"
-  >
-    <div class="flex justify-center items-center h-full">
-      <div>
-        <p class="text-[18cqw] text-center font-bold leading-none">{{ time }}</p>
-        <p class="text-[6cqw] text-center">{{ date }}</p>
-      </div>
+  <div class="flex justify-center items-center h-full">
+    <div>
+      <p class="text-[18cqmin] text-center font-bold leading-none">{{ time }}</p>
+      <p class="text-[6cqmin] text-center">{{ date }}</p>
     </div>
-  </Widget>
+  </div>
 </template>

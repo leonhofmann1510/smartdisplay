@@ -2,6 +2,7 @@ import { useHttp } from "./useHttp";
 import type { IBasicInfo } from '@/../../shared/models/IBasicInfo';
 import type { IWeatherResponse } from '@/../../shared/models/IWeatherResponse';
 import type { IApiResponse } from '@/../../shared/models/IApiResponse';
+import type { IQuote } from '@/../../shared/models/IQuote'
 
 const { get, post } = useHttp();
 const APIURL = import.meta.env.VITE_APIURL;
@@ -12,9 +13,13 @@ const getBasicInfo = (): Promise<IBasicInfo> =>
 const getWeather = (): Promise<IWeatherResponse> =>
   get<IApiResponse<IWeatherResponse>>(`${APIURL}/widget/currentWeather`).then(res => res.data!);
 
+const getRandomQuote = (): Promise<IQuote> =>
+  get<IApiResponse<IQuote>>(`${APIURL}/widget/randomQuote`).then(res => res.data!);
+
 export const useApi = () => {
   return {
     getBasicInfo,
-    getWeather
+    getWeather,
+    getRandomQuote
   };
 };
