@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-
-import Widget from '@/components/widgets/Widget.vue';
+import FitText from '../FitText.vue';
 
 const time = ref('');
 const date = ref('');
@@ -23,17 +22,12 @@ onBeforeUnmount(() => clearInterval(interval));
 </script>
 
 <template>
-  <Widget
-    :grid-from-row="1"
-    :grid-from-col="1"
-    :grid-to-row="1"
-    :grid-to-col="2"
-  >
-    <div class="flex justify-center items-center h-full">
-      <div>
-        <p class="text-[18cqw] text-center font-bold leading-none">{{ time }}</p>
-        <p class="text-[6cqw] text-center">{{ date }}</p>
-      </div>
+  <div class="flex h-full flex-col items-center justify-center px-6 py-4 gap-1">
+    <div class="w-full h-[58%]">
+      <FitText class="font-bold">{{ time }}</FitText>
     </div>
-  </Widget>
+    <div class="w-full h-[32%]">
+      <FitText>{{ date }}</FitText>
+    </div>
+  </div>
 </template>
