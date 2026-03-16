@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
+import controlRoute from './routes/control.route'
 
 dotenv.config();
 const PORT = process.env.PORT ?? 3000;
@@ -27,6 +28,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/widget", widgetRoute);
+app.use("/api/control", controlRoute);
 
 app.use(errorMiddleware);
 
