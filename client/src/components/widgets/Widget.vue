@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import type { IPosition } from '../../../../shared/models/IPosition';
 
 // ─── Props & Grid State ───────────────────────────────────────────────────────
 
 const props = defineProps<{
+  id: string;
   gridFromRow: number;
   gridToRow: number;
   gridFromCol: number;
   gridToCol: number;
 }>();
+
+const emit = defineEmits(["setWidget"]);
 
 const gridFromRow = ref(props.gridFromRow);
 const gridFromCol = ref(props.gridFromCol);
@@ -120,6 +124,16 @@ const stopDrag = () => {
   gridToRow.value = dragTargetFromRow + rowSpan;
 
   dragPreview.value = null;
+
+  const position: IPosition = {
+    gridFromCol: gridFromCol.value,
+    gridToCol: gridToCol.value,
+    gridFromRow: gridFromRow.value,
+    gridToRow: gridToRow.value
+  }
+
+  // save to backend
+  emit("setWidget", props.id, position);
 };
 
 // ─── Resizing ─────────────────────────────────────────────────────────────────
@@ -181,6 +195,13 @@ const stopResize = () => {
   height.value = tileHeight.value * rowSpan + (rowSpan - 1) * rowGap.value;
 
   resizePreview.value = { width: '0px', height: '0px' };
+
+  emit("setWidget", props.id, {
+    gridFromCol: gridFromCol.value,
+    gridToCol: gridToCol.value,
+    gridFromRow: gridFromRow.value,
+    gridToRow: gridToRow.value,
+  })
 };
 </script>
 

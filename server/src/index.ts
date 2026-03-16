@@ -4,6 +4,7 @@ import cors from 'cors';
 import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
 import path from 'path';
+import controlRoute from './routes/control.route'
 
 dotenv.config();
 const PORT = process.env.PORT ?? 3000;
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, '../public')))
 app.use(express.json());
 
 app.use("/api/widget", widgetRoute);
+app.use("/api/control", controlRoute);
 
 app.use(errorMiddleware);
 
