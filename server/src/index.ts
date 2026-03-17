@@ -6,6 +6,11 @@ import widgetRoute from './routes/widget.route'
 import path from 'path';
 import controlRoute from './routes/control.route'
 
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
+import { ITrackState } from '../../shared/models/ITrackState';
+import { ITrack } from '../../shared/models/ITrack';
+
 dotenv.config();
 const PORT = process.env.PORT ?? 3000;
 
@@ -38,3 +43,36 @@ app.use(errorMiddleware);
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
+
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*'
+  }
+});
+io.on('connection', socket => {
+
+  const audioPath = '/audio/playlist';
+  const coverPath = '/img/cover/stadler.jpg';
+
+  const dummyData: ITrackState = {
+    currentTrack: {
+      title   : 'Tiger',
+      artist  : 'D.I.P',
+      audioUrl: `${audioPath}/Tiger.mp3`,
+      coverUrl: coverPath
+    },
+    nextTrack: {
+      title   : 'Ey Kirchheim',
+      artist  : 'D.I.P',
+      audioUrl: `${audioPath}/Ey Kirchheim.mp3`,
+      coverUrl: coverPath
+    },
+    trackTime: 0
+  };
+
+  socket.emit('trackStateChange', JSON.stringify(dummyData));
+});
+
+httpServer.listen(8080);

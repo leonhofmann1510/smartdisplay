@@ -11,16 +11,20 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ArtWidget: typeof import('./src/components/widgets/ArtWidget.vue')['default']
     DatetimeWidget: typeof import('./src/components/widgets/DatetimeWidget.vue')['default']
+    FitText: typeof import('./src/components/FitText.vue')['default']
+    IconMdiAlbum: typeof import('~icons/mdi/album')['default']
     IconMdiChevronLeft: typeof import('~icons/mdi/chevron-left')['default']
     IconMdiChevronRight: typeof import('~icons/mdi/chevron-right')['default']
     IconMdiPause: typeof import('~icons/mdi/pause')['default']
     IconMdiPlayArrow: typeof import('~icons/mdi/play-arrow')['default']
     InfoWidget: typeof import('./src/components/widgets/InfoWidget.vue')['default']
     MusicWidget: typeof import('./src/components/widgets/MusicWidget.vue')['default']
+    QuoteWidget: typeof import('./src/components/widgets/QuoteWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    WeatherIcon: typeof import('./src/components/widgets/WeatherIcon.vue')['default']
+    WeatherIcon: typeof import('./src/components/WeatherIcon.vue')['default']
     WeatherWidget: typeof import('./src/components/widgets/WeatherWidget.vue')['default']
     Widget: typeof import('./src/components/widgets/Widget.vue')['default']
   }
