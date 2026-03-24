@@ -9,6 +9,7 @@ import Music from '@/pages/dashboard/Music.vue';
 import Settings from '@/pages/dashboard/Settings.vue';
 import ToDos from '@/pages/dashboard/ToDos.vue';
 import Weather from '@/pages/dashboard/Weather.vue';
+import Edit from '@/pages/dashboard/Edit.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +53,11 @@ const router = createRouter({
       name     : 'weather',
       path     : '/dashboard/weather',
       component: Weather
+    },
+    {
+      name     : 'edit',
+      path     : '/dashboard/edit',
+      component: Edit
     },
   ],
 });

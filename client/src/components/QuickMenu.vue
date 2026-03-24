@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Music, Settings, Calendar, ListTodo, CloudSun, Pencil } from 'lucide-vue-next';
+import { Music, Settings, Calendar, ListTodo, CloudSun, Pencil, LayoutGrid } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -87,6 +87,19 @@ const route = useRoute();
           <Pencil class="text-white w-4 h-4 sm:w-6 sm:h-6" />
           <h1 class="text-white text-[10px] sm:text-sm text-center">
             Draw
+          </h1>
+        </RouterLink>
+      </div>
+
+      <!-- Edit (desktop only) -->
+      <div
+        class="hidden min-[1300px]:flex flex-1 min-w-[70px] sm:min-w-0 max-w-[90px] sm:max-w-none bg-blue-400 rounded-2xl aspect-square hover:scale-[1.05] transition"
+        :class="{ 'scale-[1.05]': route.name === 'edit' }"
+      >
+        <RouterLink class="flex items-center justify-center h-full w-full flex-col gap-1 p-2" :to="{ name: 'edit' }">
+          <LayoutGrid class="text-white w-4 h-4 sm:w-6 sm:h-6" />
+          <h1 class="text-white text-[10px] sm:text-sm text-center">
+            Edit
           </h1>
         </RouterLink>
       </div>

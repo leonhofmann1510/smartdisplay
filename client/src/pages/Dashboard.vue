@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Music, Settings, Calendar, ListTodo, CloudSun, Pencil } from 'lucide-vue-next';
+import { Music, Settings, Calendar, ListTodo, CloudSun, Pencil, LayoutGrid } from 'lucide-vue-next';
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { useApi } from '@/composables/useApi';
@@ -82,6 +82,16 @@ getBasicInfo()
             <Pencil class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
               Draw
+            </h1>
+          </RouterLink>
+        </div>
+
+        <!-- Edit Widgets -->
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'edit' }">
+            <LayoutGrid class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
+            <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
+              Edit Widgets
             </h1>
           </RouterLink>
         </div>

@@ -1,6 +1,8 @@
 import dotenv from 'dotenv'
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
 import path from 'path';
@@ -10,6 +12,12 @@ dotenv.config();
 const PORT = process.env.PORT ?? 3000;
 
 const app = express();
+const httpServer = createServer(app);
+export const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  }
+});
 
 // const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173')
 //   .split(',')
@@ -35,6 +43,13 @@ app.use("/api/control", controlRoute);
 
 app.use(errorMiddleware);
 
-app.listen(PORT, () => {
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
+
+httpServer.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });

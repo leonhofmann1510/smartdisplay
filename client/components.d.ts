@@ -21,6 +21,7 @@ declare module 'vue' {
     IconMdiPlayArrow: typeof import('~icons/mdi/play-arrow')['default']
     InfoWidget: typeof import('./src/components/widgets/InfoWidget.vue')['default']
     MusicWidget: typeof import('./src/components/widgets/MusicWidget.vue')['default']
+    QuickMenu: typeof import('./src/components/QuickMenu.vue')['default']
     QuoteWidget: typeof import('./src/components/widgets/QuoteWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

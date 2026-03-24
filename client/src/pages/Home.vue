@@ -1,24 +1,21 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import type { IWidget } from '@/../../shared/models/IWidget';
-import type { IPosition } from '@/../../shared/models/IPosition';
 import Widget from '@/components/widgets/Widget.vue';
 import { useApi } from '@/composables/useApi';
+import { useWidgetSocket } from '@/composables/useWidgetSocket';
 
-const { getWidgets, setWidgets } = useApi();
+const { getWidgets } = useApi();
 const loadedWidgets = ref<IWidget[] | null>();
 
 const getAllWidgets = async () => {
   loadedWidgets.value = await getWidgets();
 };
 
-const setWidget = async (id: string, position: IPosition) => {
-  if (!loadedWidgets.value) return
-  const widget = loadedWidgets.value.find(w => w.id === id)
-  if (!widget) return
-  widget.props.position = position
-  await setWidgets(loadedWidgets.value)
-}
+// Listen for real-time widget updates from dashboard editor
+useWidgetSocket((widgets) => {
+  loadedWidgets.value = widgets;
+});
 
 onMounted(async () => {
   await getAllWidgets();
@@ -34,8 +31,8 @@ onMounted(async () => {
         v-for="({ componentName, props, id }) in loadedWidgets"
         :key="id"
         :id="id"
+        :editable="false"
         v-bind="props.position"
-        @set-widget="setWidget"
       >
         <component :is="componentName" v-bind="props.specific" />
       </Widget>

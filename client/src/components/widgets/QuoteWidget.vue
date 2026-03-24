@@ -4,9 +4,11 @@ import type { IQuote } from '../../../../shared/models/IQuote';
 import { useApi } from '@/composables/useApi';
 import FitText from '../FitText.vue';
 
-const props = defineProps<{
-  cycleLength: number
-}>();
+const props = withDefaults(defineProps<{
+  cycleLength?: number
+}>(), {
+  cycleLength: 30
+});
 
 const width: Ref<number, number> = ref(0);
 let timer: number = 0;

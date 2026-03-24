@@ -3,6 +3,7 @@ import { IBasicInfo } from "../../../shared/models/IBasicInfo";
 import { sendError, sendSuccess } from "../utils/response";
 import { JsonHandler, JsonValue } from "../utils/jsonHandler";
 import { IWidget } from "../../../shared/models/IWidget";
+import { io } from "../index";
 
 export const getBasicInfo = async (req: Request, res: Response) => {
   const basicInfo: IBasicInfo = {
@@ -36,5 +37,9 @@ export const setWidgets = async (req: Request, res: Response) => {
 
   // body has to be IWidget[]
   store.set("widgets", req.body);
+
+  // Emit event to all connected clients
+  io.emit('widgetsChange', req.body);
+
   sendSuccess(res, req.body, "Widget information set successfully");
 }

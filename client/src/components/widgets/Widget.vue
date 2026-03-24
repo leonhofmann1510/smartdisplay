@@ -1,23 +1,32 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import type { IPosition } from '../../../../shared/models/IPosition';
 
 // ─── Props & Grid State ───────────────────────────────────────────────────────
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   id: string;
   gridFromRow: number;
   gridToRow: number;
   gridFromCol: number;
   gridToCol: number;
-}>();
+  editable?: boolean;
+}>(), {
+  editable: true
+});
 
-const emit = defineEmits(["setWidget"]);
+const emit = defineEmits(["setWidget", "deleteWidget"]);
 
 const gridFromRow = ref(props.gridFromRow);
 const gridFromCol = ref(props.gridFromCol);
 const gridToRow = ref(props.gridToRow);
 const gridToCol = ref(props.gridToCol);
+
+// Sync internal refs when props change (for real-time updates)
+watch(() => props.gridFromRow, (val) => { gridFromRow.value = val });
+watch(() => props.gridFromCol, (val) => { gridFromCol.value = val });
+watch(() => props.gridToRow, (val) => { gridToRow.value = val });
+watch(() => props.gridToCol, (val) => { gridToCol.value = val });
 
 const cssStyles = computed(() => ({
   'grid-area': `${gridFromRow.value} / ${gridFromCol.value} / ${gridToRow.value + 1} / ${gridToCol.value + 1}`,
@@ -208,21 +217,31 @@ const stopResize = () => {
 <template>
   <div ref="widgetDiv" :style="cssStyles" class="bg-white shadow-xl rounded-xl @container relative">
 
-    <!-- Drag handle -->
-    <div
-      class="w-8 h-2 bg-gray-300 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2 z-20 cursor-move"
-      @mousedown.prevent="startDrag"
-    />
+    <template v-if="editable">
+      <!-- Drag handle -->
+      <div
+        class="w-8 h-2 bg-gray-300 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2 z-20 cursor-move"
+        @mousedown.prevent="startDrag"
+      />
 
-    <!-- Resize handle -->
-    <div
-      id="resize"
-      class="bg-red w-[10px] h-[10px] absolute right-0 bottom-0 z-20 hover:cursor-nw-resize"
-      @mousedown="startResize"
-    />
+      <!-- Resize handle -->
+      <div
+        id="resize"
+        class="bg-red w-[10px] h-[10px] absolute right-0 bottom-0 z-20 hover:cursor-nw-resize"
+        @mousedown="startResize"
+      />
 
-    <!-- Resize preview overlay -->
-    <div :style="resizePreview" class="absolute opacity-20 rounded-xl z-50 bg-red-500 top-0 left-0" />
+      <!-- Delete button -->
+      <button
+        class="absolute top-1.5 right-1.5 z-20 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition"
+        @click="emit('deleteWidget', id)"
+      >
+        &times;
+      </button>
+
+      <!-- Resize preview overlay -->
+      <div :style="resizePreview" class="absolute opacity-20 rounded-xl z-50 bg-red-500 top-0 left-0" />
+    </template>
 
     <slot />
 

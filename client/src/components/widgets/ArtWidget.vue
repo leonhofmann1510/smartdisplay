@@ -4,9 +4,11 @@ import type { IArt } from '@/../../shared/models/IArt';
 import { useApi } from '@/composables/useApi';
 import FitText from '../FitText.vue';
 
-const props = defineProps<{
-	cycleLength: number
-}>();
+const props = withDefaults(defineProps<{
+	cycleLength?: number
+}>(), {
+	cycleLength: 30
+});
 
 const width: Ref<number, number> = ref(0);
 const art = ref<IArt | null>(null);
