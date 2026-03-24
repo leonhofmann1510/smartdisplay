@@ -5,6 +5,8 @@ import type { IApiResponse } from '@/../../shared/models/IApiResponse';
 import type { IQuote } from '@/../../shared/models/IQuote'
 import type { IArt } from '@/../../shared/models/IArt'
 import type { IWidget } from '@/../../shared/models/IWidget'
+import type { ITrackState } from '@/../../shared/models/ITrackState'
+import type { IMusicAction } from '@/../../shared/models/IMusicAction'
 
 const { get, post } = useHttp();
 const APIURL = import.meta.env.VITE_APIURL;
@@ -15,8 +17,6 @@ const getBasicInfo = (): Promise<IBasicInfo> =>
 const getWeather = (): Promise<IWeatherResponse> =>
   get<IApiResponse<IWeatherResponse>>(`${APIURL}/widget/currentWeather`).then(res => res.data!);
 
-const getPlaylist = (): Promise<IApiResponse<string[]>> =>
-  get<IApiResponse<string[]>>(`${APIURL}/widget/playlist`) 
 const getRandomQuote = (): Promise<IQuote> =>
   get<IApiResponse<IQuote>>(`${APIURL}/widget/randomQuote`).then(res => res.data!);
 
@@ -26,18 +26,28 @@ const getRandomArt = (): Promise<IArt> =>
 const getWidgets = (): Promise<IWidget[]> =>
   get<IApiResponse<IWidget[]>>(`${APIURL}/control/getWidgets`).then(res => res.data!);
 
-
 const setWidgets = (widgets: IWidget[]): Promise<IWidget[]> =>
   post<IApiResponse<IWidget[]>>(`${APIURL}/control/setWidgets`, widgets).then(res => res.data!);
+
+const getMusicState = (): Promise<ITrackState> =>
+  get<IApiResponse<ITrackState>>(`${APIURL}/widget/music/state`).then(res => res.data!);
+
+const postMusicAction = (action: IMusicAction): Promise<ITrackState> =>
+  post<IApiResponse<ITrackState>>(`${APIURL}/widget/music/action`, action).then(res => res.data!);
+
+const syncTrackTime = (trackTime: number): Promise<void> =>
+  post<IApiResponse<null>>(`${APIURL}/widget/music/sync`, { trackTime }).then(() => {});
 
 export const useApi = () => {
   return {
     getBasicInfo,
     getWeather,
-    getPlaylist,
     getRandomQuote,
     getRandomArt,
     getWidgets,
-    setWidgets
+    setWidgets,
+    getMusicState,
+    postMusicAction,
+    syncTrackTime
   };
 };

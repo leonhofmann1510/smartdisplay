@@ -4,9 +4,6 @@ import { sendError, sendSuccess } from "../utils/response";
 import { JsonHandler, JsonValue } from "../utils/jsonHandler";
 import { IWidget } from "../../../shared/models/IWidget";
 
-import { readdir } from 'fs/promises';
-import path from 'path';
-
 export const getBasicInfo = async (req: Request, res: Response) => {
   const basicInfo: IBasicInfo = {
     title: "Smart Display",
@@ -15,12 +12,6 @@ export const getBasicInfo = async (req: Request, res: Response) => {
   }
 
   sendSuccess(res, basicInfo, "Basic information retrieved successfully");
-};
-
-export const getPlaylist = async (req: Request, res: Response) => {
-  const playlistPath = path.join(__dirname, '../../public/audio/playlist');
-  const playlist = await readdir(playlistPath);
-  sendSuccess(res, playlist);
 };
 
 let store: JsonHandler | null = null

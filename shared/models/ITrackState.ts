@@ -1,7 +1,9 @@
-import { ITrack } from './ITrack';
+import type { ITrack } from './ITrack';
 
 export interface ITrackState {
   currentTrack: ITrack | null;
   nextTrack   : ITrack | null;
-  trackTime   : number
+  trackTime   : number;
+  isPlaying   : boolean;
+  playlist    : ITrack[];
 }

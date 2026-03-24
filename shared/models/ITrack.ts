@@ -3,4 +3,5 @@ export interface ITrack {
   artist  : string;
   coverUrl: string;
   audioUrl: string;
+  duration: number;
 }
