@@ -27,8 +27,8 @@ getBasicInfo()
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
 
         <!-- Settings -->
-        <div class="bg-blue-300 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
-          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'draw' }">
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'settings' }">
             <Settings class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
               Settings
@@ -37,8 +37,8 @@ getBasicInfo()
         </div>
 
         <!-- Music -->
-        <div class="bg-blue-300 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
-          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'draw' }">
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'music' }">
             <Music class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
               Music
@@ -47,8 +47,8 @@ getBasicInfo()
         </div>
 
         <!-- Calendar -->
-        <div class="bg-blue-300 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
-          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'draw' }">
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'calendar' }">
             <Calendar class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
               Calendar
@@ -57,8 +57,8 @@ getBasicInfo()
         </div>
 
         <!-- To-Dos -->
-        <div class="bg-blue-300 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
-          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'draw' }">
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'todos' }">
             <ListTodo class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
               To-Dos
@@ -67,8 +67,8 @@ getBasicInfo()
         </div>
 
         <!-- Weather -->
-        <div class="bg-blue-300 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
-          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'draw' }">
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+          <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'weather' }">
             <CloudSun class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
               Weather
@@ -77,7 +77,7 @@ getBasicInfo()
         </div>
 
         <!-- Draw -->
-        <div class="bg-blue-300 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
+        <div class="bg-blue-400 rounded-2xl aspect-square sm:aspect-[4/3] hover:scale-[1.02] transition">
           <RouterLink class="flex items-center justify-center h-full flex-col gap-2 p-3" :to="{ name: 'draw' }">
             <Pencil class="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             <h1 class="text-white text-lg sm:text-xl lg:text-2xl text-center">
