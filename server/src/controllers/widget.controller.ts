@@ -23,13 +23,8 @@ const getStore = (): Promise<JsonHandler> => {
 
 export const getWidgets = async (req: Request, res: Response) => {
   const store = await getStore();
-  const storedWidgets = store.get<IWidget[]>("widgets");
-
-  if (storedWidgets) {
-    sendSuccess(res, storedWidgets, "Widget information retrieved successfully");
-  } else {
-    sendError(res, "Could not get widgets");
-  }
+  const storedWidgets = store.get<IWidget[]>("widgets") ?? [];
+  sendSuccess(res, storedWidgets, "Widget information retrieved successfully");
 }
 
 export const setWidgets = async (req: Request, res: Response) => {
