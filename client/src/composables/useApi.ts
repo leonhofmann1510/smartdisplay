@@ -60,11 +60,11 @@ const getCalendarEvents = (): Promise<ICalendarEvent[]> =>
 const getThisWeekEvents = (): Promise<ICalendarEvent[]> =>
   get<IApiResponse<ICalendarEvent[]>>(`${APIURL}/calendar/thisweek`).then(res => res.data ?? []);
 
-const addCalendarEvent = (name: string, date: string): Promise<ICalendarEvent> =>
-  post<IApiResponse<ICalendarEvent>>(`${APIURL}/calendar/add`, { name, date }).then(res => res.data!);
+const addCalendarEvent = (name: string, date: string, endDate?: string): Promise<ICalendarEvent> =>
+  post<IApiResponse<ICalendarEvent>>(`${APIURL}/calendar/add`, { name, date, ...(endDate ? { endDate } : {}) }).then(res => res.data!);
 
-const updateCalendarEvent = (id: string, name: string, date: string): Promise<ICalendarEvent> =>
-  put<IApiResponse<ICalendarEvent>>(`${APIURL}/calendar/update/${id}`, { name, date }).then(res => res.data!);
+const updateCalendarEvent = (id: string, name: string, date: string, endDate?: string): Promise<ICalendarEvent> =>
+  put<IApiResponse<ICalendarEvent>>(`${APIURL}/calendar/update/${id}`, { name, date, endDate: endDate ?? '' }).then(res => res.data!);
 
 const deleteCalendarEvent = (id: string): Promise<void> =>
   del<IApiResponse<null>>(`${APIURL}/calendar/delete/${id}`).then(() => {});

@@ -21,9 +21,13 @@ const loadThisWeekEvents = async () => {
   }
 };
 
-const formatDate = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+const formatDate = (event: ICalendarEvent): string => {
+  const fmt = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+  if (!event.endDate || event.endDate === event.date) return fmt(event.date);
+  return `${fmt(event.date)} – ${fmt(event.endDate)}`;
 };
 
 onMounted(() => {
@@ -59,7 +63,7 @@ onUnmounted(() => {
         class="flex items-center gap-2 text-sm py-1 border-b border-gray-100 last:border-0"
       >
         <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded whitespace-nowrap">
-          {{ formatDate(event.date) }}
+          {{ formatDate(event) }}
         </span>
         <span class="text-gray-600 truncate">{{ event.name }}</span>
       </li>

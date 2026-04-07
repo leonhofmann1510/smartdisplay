@@ -16,9 +16,11 @@ const currentDate = ref(new Date());
 const showAddForm = ref(false);
 const newEventName = ref('');
 const newEventDate = ref('');
+const newEventEndDate = ref('');
 const editingId = ref<string | null>(null);
 const editingName = ref('');
 const editingDate = ref('');
+const editingEndDate = ref('');
 const isLoading = ref(false);
 let socket: Socket | null = null;
 
@@ -46,7 +48,10 @@ const daysInMonth = computed(() => {
   for (let day = 1; day <= lastDay.getDate(); day++) {
     const date = new Date(year, month, day);
     const dateStr = formatDateForCompare(date);
-    const dayEvents = events.value.filter(e => e.date === dateStr);
+    const dayEvents = events.value.filter(e => {
+      const end = e.endDate ?? e.date;
+      return dateStr >= e.date && dateStr <= end;
+    });
     days.push({ date, isCurrentMonth: true, events: dayEvents });
   }
   
@@ -64,12 +69,20 @@ const sortedEvents = computed(() => {
 });
 
 const formatDateForCompare = (date: Date): string => {
-  return date.toISOString().substring(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 };
 
 const formatDisplayDate = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+};
+
+const formatDateRange = (event: ICalendarEvent): string => {
+  if (!event.endDate || event.endDate === event.date) return formatDisplayDate(event.date);
+  return `${formatDisplayDate(event.date)} – ${formatDisplayDate(event.endDate)}`;
 };
 
 const isToday = (date: Date): boolean => {
@@ -91,11 +104,13 @@ const loadEvents = async () => {
 
 const handleAddEvent = async () => {
   if (!newEventName.value.trim() || !newEventDate.value || isLoading.value) return;
+  if (newEventEndDate.value && newEventEndDate.value < newEventDate.value) return;
   isLoading.value = true;
   try {
-    await addCalendarEvent(newEventName.value.trim(), newEventDate.value);
+    await addCalendarEvent(newEventName.value.trim(), newEventDate.value, newEventEndDate.value || undefined);
     newEventName.value = '';
     newEventDate.value = '';
+    newEventEndDate.value = '';
     showAddForm.value = false;
   } finally {
     isLoading.value = false;
@@ -106,19 +121,21 @@ const startEdit = (event: ICalendarEvent) => {
   editingId.value = event.id;
   editingName.value = event.name;
   editingDate.value = event.date;
+  editingEndDate.value = event.endDate ?? '';
 };
 
 const cancelEdit = () => {
   editingId.value = null;
   editingName.value = '';
   editingDate.value = '';
+  editingEndDate.value = '';
 };
 
 const handleUpdateEvent = async () => {
   if (!editingId.value || !editingName.value.trim() || !editingDate.value || isLoading.value) return;
   isLoading.value = true;
   try {
-    await updateCalendarEvent(editingId.value, editingName.value.trim(), editingDate.value);
+    await updateCalendarEvent(editingId.value, editingName.value.trim(), editingDate.value, editingEndDate.value || undefined);
     cancelEdit();
   } finally {
     isLoading.value = false;
@@ -185,11 +202,25 @@ onUnmounted(() => {
             placeholder="Event name"
             class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <input
-            v-model="newEventDate"
-            type="date"
-            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+          <div class="flex gap-2">
+            <div class="flex-1">
+              <label class="text-xs text-gray-500 mb-1 block">Start date</label>
+              <input
+                v-model="newEventDate"
+                type="date"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div class="flex-1">
+              <label class="text-xs text-gray-500 mb-1 block">End date (optional)</label>
+              <input
+                v-model="newEventEndDate"
+                type="date"
+                :min="newEventDate"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+          </div>
           <div class="flex gap-2">
             <button
               type="submit"
@@ -285,11 +316,20 @@ onUnmounted(() => {
                 type="text"
                 class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
-              <input
-                v-model="editingDate"
-                type="date"
-                class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
+              <div class="flex gap-2">
+                <input
+                  v-model="editingDate"
+                  type="date"
+                  class="flex-1 px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <input
+                  v-model="editingEndDate"
+                  type="date"
+                  :min="editingDate"
+                  placeholder="End date"
+                  class="flex-1 px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
               <div class="flex gap-2">
                 <button
                   @click="handleUpdateEvent"
@@ -310,7 +350,7 @@ onUnmounted(() => {
             <!-- View Mode -->
             <div v-else class="flex items-center gap-3">
               <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded whitespace-nowrap">
-                {{ formatDisplayDate(event.date) }}
+                {{ formatDateRange(event) }}
               </span>
               <span class="flex-1 text-gray-700">{{ event.name }}</span>
               <button

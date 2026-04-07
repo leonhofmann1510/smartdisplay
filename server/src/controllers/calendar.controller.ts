@@ -37,8 +37,9 @@ export const getThisWeekEvents = async (req: Request, res: Response) => {
   sunday.setHours(23, 59, 59, 999);
 
   const thisWeekEvents = events.filter(event => {
-    const eventDate = new Date(event.date);
-    return eventDate >= monday && eventDate <= sunday;
+    const eventStart = new Date(event.date);
+    const eventEnd = event.endDate ? new Date(event.endDate) : eventStart;
+    return eventStart <= sunday && eventEnd >= monday;
   });
 
   sendSuccess(res, sortEventsByDate(thisWeekEvents), "This week events retrieved successfully");
@@ -46,12 +47,13 @@ export const getThisWeekEvents = async (req: Request, res: Response) => {
 
 export const addEvent = async (req: Request, res: Response) => {
   const store = await getStore();
-  const { name, date } = req.body;
+  const { name, date, endDate } = req.body;
 
   const newEvent: ICalendarEvent = {
     id: Date.now().toString(),
     name,
     date,
+    ...(endDate ? { endDate } : {}),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -67,7 +69,7 @@ export const addEvent = async (req: Request, res: Response) => {
 export const updateEvent = async (req: Request, res: Response) => {
   const store = await getStore();
   const { id } = req.params;
-  const { name, date } = req.body;
+  const { name, date, endDate } = req.body;
 
   const events = store.get<ICalendarEvent[]>("events") ?? [];
   const eventIndex = events.findIndex(e => e.id === id);
@@ -78,6 +80,10 @@ export const updateEvent = async (req: Request, res: Response) => {
 
   if (name) events[eventIndex].name = name;
   if (date) events[eventIndex].date = date;
+  if ('endDate' in req.body) {
+    if (endDate) events[eventIndex].endDate = endDate;
+    else delete events[eventIndex].endDate;
+  }
   events[eventIndex].updatedAt = new Date().toISOString();
   store.set("events", events as unknown as Parameters<typeof store.set>[1]);
 
