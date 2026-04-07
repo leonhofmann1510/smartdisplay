@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { ChevronLeft, ChevronRight, Clock, CloudSun, Image, Info, MessageSquareQuote, Music } from 'lucide-vue-next'
+import { RouterLink } from 'vue-router'
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock, CloudSun, Image, Info, MessageSquareQuote, Music, ListTodo, Calendar } from 'lucide-vue-next'
 import type { IWidget } from '@/../../shared/models/IWidget'
 import type { IPosition } from '@/../../shared/models/IPosition'
 import Widget from '@/components/widgets/Widget.vue'
-import QuickMenu from '@/components/QuickMenu.vue'
 import { useApi } from '@/composables/useApi'
 
 const { getWidgets, setWidgets } = useApi()
@@ -18,6 +18,8 @@ const widgetTemplates = [
   { componentName: 'ArtWidget', label: 'Art', icon: Image },
   { componentName: 'MusicWidget', label: 'Music', icon: Music },
   { componentName: 'InfoWidget', label: 'Info', icon: Info },
+  { componentName: 'TodoWidget', label: 'To-Do List', icon: ListTodo },
+  { componentName: 'CalendarWidget', label: 'Calendar', icon: Calendar },
 ]
 
 const getAllWidgets = async () => {
@@ -133,8 +135,21 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col bg-slate-100 pt-34">
-    <QuickMenu />
+  <div class="h-screen flex flex-col bg-slate-100">
+    <!-- Header -->
+    <div class="sticky top-0 bg-white shadow-sm z-10">
+      <div class="px-4 py-4">
+        <div class="flex items-center gap-4">
+          <RouterLink 
+            :to="{ name: 'dashboard' }" 
+            class="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition"
+          >
+            <ArrowLeft class="w-5 h-5 text-gray-600" />
+          </RouterLink>
+          <h1 class="text-xl font-semibold text-gray-800">Edit Widgets</h1>
+        </div>
+      </div>
+    </div>
 
     <div class="flex-1 flex overflow-hidden">
       <!-- Sidebar -->

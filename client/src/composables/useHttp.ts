@@ -39,9 +39,19 @@ const post = <T>(url: string, payload: Object): Promise<T> => {
   return postRequest<T>(url, 'POST', payload);
 };
 
+const put = <T>(url: string, payload: Object): Promise<T> => {
+  return postRequest<T>(url, 'PUT', payload);
+};
+
+const del = <T>(url: string): Promise<T> => {
+  return getRequest<T>(url, 'DELETE', null);
+};
+
 export const useHttp = () => {
   return {
     get,
-    post
+    post,
+    put,
+    del
   }
 };

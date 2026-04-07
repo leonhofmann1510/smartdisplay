@@ -7,6 +7,8 @@ import { errorMiddleware } from './middleware/error.middleware';
 import widgetRoute from './routes/widget.route'
 import path from 'path';
 import controlRoute from './routes/control.route'
+import todoRoute from './routes/todo.route'
+import calendarRoute from './routes/calendar.route'
 
 dotenv.config();
 const PORT = process.env.PORT ?? 3000;
@@ -40,6 +42,8 @@ app.use(express.json());
 
 app.use("/api/widget", widgetRoute);
 app.use("/api/control", controlRoute);
+app.use("/api/todo", todoRoute);
+app.use("/api/calendar", calendarRoute);
 
 app.use(errorMiddleware);
 

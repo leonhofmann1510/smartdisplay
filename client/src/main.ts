@@ -10,6 +10,8 @@ import InfoWidget from './components/widgets/InfoWidget.vue'
 import WeatherWidget from './components/widgets/WeatherWidget.vue'
 import ArtWidget from './components/widgets/ArtWidget.vue'
 import MusicWidget from './components/widgets/MusicWidget.vue'
+import TodoWidget from './components/widgets/TodoWidget.vue'
+import CalendarWidget from './components/widgets/CalendarWidget.vue'
 
 import './assets/styles/style.css';
 
@@ -24,5 +26,7 @@ app.component('InfoWidget', InfoWidget);
 app.component('WeatherWidget', WeatherWidget);
 app.component('ArtWidget', ArtWidget);
 app.component('MusicWidget', MusicWidget);
+app.component('TodoWidget', TodoWidget);
+app.component('CalendarWidget', CalendarWidget);
 
 app.mount('#app')
