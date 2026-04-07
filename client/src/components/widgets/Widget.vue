@@ -54,17 +54,20 @@ const updateTileDimensions = () => {
   tileHeight.value = (widgetDiv.value.offsetHeight - (rowSpan - 1) * rowGap.value) / rowSpan;
 };
 
+let resizeObserver: ResizeObserver | null = null;
+
 onMounted(() => {
   if (widgetDiv.value) {
     width.value = widgetDiv.value.offsetWidth;
     height.value = widgetDiv.value.offsetHeight;
+    resizeObserver = new ResizeObserver(updateTileDimensions);
+    resizeObserver.observe(widgetDiv.value);
   }
   updateTileDimensions();
-  window.addEventListener('resize', updateTileDimensions);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', updateTileDimensions);
+  resizeObserver?.disconnect();
 });
 
 // ─── Dragging ─────────────────────────────────────────────────────────────────

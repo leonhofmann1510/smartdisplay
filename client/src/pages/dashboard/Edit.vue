@@ -133,7 +133,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col bg-slate-100 pt-24">
+  <div class="h-screen flex flex-col bg-slate-100 pt-34">
     <QuickMenu />
 
     <div class="flex-1 flex overflow-hidden">
